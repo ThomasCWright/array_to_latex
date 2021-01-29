@@ -6,7 +6,7 @@ arrays to LaTeX form.
 """
 
 # Note- version must also be set in setup.py
-__version__ = '0.82'
+__version__ = 'TCW'
 __all__ = ['to_clp', 'to_ltx', '__version__']
 
 __author__ = u'Joseph C. Slater'
@@ -63,7 +63,7 @@ def to_clp(a, frmt='{:1.2f}', arraytype='bmatrix', imstring='j'):
 
 
 def _numpyarraytolatex(a, frmt='{:6.2f}', arraytype='bmatrix', nargout=0,
-                       imstring='j', row=True, mathform=True):
+                       imstring='j', row=True, mathform=True, inline=False):
     r"""Return a LaTeX array given a numpy array.
 
     Parameters
@@ -121,8 +121,11 @@ def _numpyarraytolatex(a, frmt='{:6.2f}', arraytype='bmatrix', nargout=0,
         a = _np.array([a])
         if row is False:
             a = a.T
-
+    # if inline:
+    #     out = r'\begin {{' + arraytype + '}}\n'
+    # else:
     out = r'\begin{' + arraytype + '}\n'
+    
     for i in _np.arange(a.shape[0]):
         out = out + ' '
         for j in _np.arange(a.shape[1]):
@@ -154,8 +157,10 @@ def _numpyarraytolatex(a, frmt='{:6.2f}', arraytype='bmatrix', nargout=0,
 
         out = out[:-3]
         out = out + '\\\\\n'
-
-    out = out[:-3] + '\n' + r'\end{' + arraytype + '}'
+    if inline:
+        out = out[:-3].replace('\n',' ')  + r' \end {' + arraytype + '}'
+    else:
+        out = out[:-3] + '\n' + r'\end{' + arraytype + '}'
 
     return out
 
@@ -290,7 +295,7 @@ def _dataframetolatex(df,
     return out
 
 def to_ltx(a, frmt='{:1.2f}', arraytype=None, nargout=0,
-           imstring='j', row=True, mathform=True, print_out=True):
+           imstring='j', row=True, mathform=True, print_out=True,inline=False):
     r"""
     Print or return a LaTeX array given a numpy array or Pandas dataframe.
 
@@ -351,7 +356,7 @@ def to_ltx(a, frmt='{:1.2f}', arraytype=None, nargout=0,
             arraytype = 'bmatrix'
         latex = _numpyarraytolatex(a, frmt=frmt, arraytype=arraytype,
                                    nargout=nargout, imstring=imstring,
-                                   row=row, mathform=mathform)
+                                   row=row, mathform=mathform, inline=inline)
 
     elif isinstance(a, _pd.core.frame.DataFrame):
 
